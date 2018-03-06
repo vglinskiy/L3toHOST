@@ -1,14 +1,14 @@
 
 !Command: show running-config
-!Time: Sat Nov 11 03:57:18 2017
+!Time: Mon Mar  5 02:11:39 2018
 
 version 7.0(3)I7(1)
 hostname rtr2
-vdc spine id 1
+vdc rtr2 id 1
   limit-resource vlan minimum 16 maximum 4094
   limit-resource vrf minimum 2 maximum 4096
   limit-resource port-channel minimum 0 maximum 511
-  limit-resource u4route-mem minimum 248 maximum 248
+  limit-resource u4route-mem minimum 128 maximum 128
   limit-resource u6route-mem minimum 96 maximum 96
   limit-resource m4route-mem minimum 58 maximum 58
   limit-resource m6route-mem minimum 8 maximum 8
@@ -184,10 +184,18 @@ interface Ethernet1/64
 interface mgmt0
   ip address dhcp
   vrf member management
-
 line console
 line vty
 boot nxos bootflash:/nxos.7.0.3.I7.1.bin 
+router bgp 64920
+  address-family ipv4 unicast
+    network 192.168.22.2/31
+  neighbor 192.168.22.2
+    remote-as 65499
+    address-family ipv4 unicast
+  neighbor 192.168.99.3
+    remote-as 65000
+    address-family ipv4 unicast
 ip arp
 
 

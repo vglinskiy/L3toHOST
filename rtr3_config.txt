@@ -1,14 +1,14 @@
 
 !Command: show running-config
-!Time: Sat Nov 11 03:57:18 2017
+!Time: Mon Mar  5 02:12:12 2018
 
 version 7.0(3)I7(1)
 hostname rtr3
-vdc spine id 1
+vdc rtr3 id 1
   limit-resource vlan minimum 16 maximum 4094
   limit-resource vrf minimum 2 maximum 4096
   limit-resource port-channel minimum 0 maximum 511
-  limit-resource u4route-mem minimum 248 maximum 248
+  limit-resource u4route-mem minimum 128 maximum 128
   limit-resource u6route-mem minimum 96 maximum 96
   limit-resource m4route-mem minimum 58 maximum 58
   limit-resource m6route-mem minimum 8 maximum 8
@@ -18,8 +18,8 @@ feature bash-shell
 feature scp-server
 feature ospf
 feature bgp
-feature lldp
 feature interface-vlan
+feature lldp
 
 no password strength-check
 username admin password 5 $5$bFlOCeX2$Bgnf4kzZPWPkekMalE84W1uKRlG705WCn141FZLOCWC  role network-admin
@@ -43,12 +43,16 @@ vlan 1,99
 vrf context management
   ip route 0.0.0.0/0 10.0.2.2
 
+interface Vlan1
+
+interface Vlan99
+  no shutdown
+  no autostate
+  ip address 172.16.99.1/24
+
 interface Ethernet1/1
   description bird2
-  switchport
-  switchport mode access
   switchport access vlan 99
-  no shutdown
 
 interface Ethernet1/2
   description rtr2
@@ -186,18 +190,24 @@ interface Ethernet1/63
 
 interface Ethernet1/64
 
-interface Vlan 200
-no shutdown
-no autostate
-ip address 172.16.99.1/24
-
 interface mgmt0
   ip address dhcp
   vrf member management
-
 line console
 line vty
 boot nxos bootflash:/nxos.7.0.3.I7.1.bin 
+router bgp 65000
+  bestpath as-path multipath-relax
+  address-family ipv4 unicast
+    network 172.16.99.0/24
+    maximum-paths 4
+    maximum-paths ibgp 4
+  neighbor 192.168.99.0
+    remote-as 64900
+    address-family ipv4 unicast
+  neighbor 192.168.99.2
+    remote-as 64920
+    address-family ipv4 unicast
 ip arp
 
 
