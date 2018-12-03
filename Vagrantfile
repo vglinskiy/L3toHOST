@@ -91,9 +91,10 @@ Vagrant.configure(2) do |config|
     config.vm.provider "virtualbox" do |bird1|
       bird1.name = "bird1"
     end
-    bird1.vm.box = "minimal/xenial64"
+    bird1.vm.box = "ubuntu/bionic64"
         bird1.vm.network :forwarded_port, guest: 22, host: 12200, id: 'ssh'
         bird1.vm.network "private_network", virtualbox__intnet: "hostA_vtepA", auto_config: false
+        bird1.vm.network "private_network", virtualbox__intnet: "hostB_vtepB", auto_config: false
         bird1.vm.network "private_network", virtualbox__intnet: "hostB_vtepB", auto_config: false
         bird1.vm.provision "shell", inline: <<-SHELL
           sudo ip addr add 192.168.11.2/31 dev enp0s8
@@ -101,9 +102,8 @@ Vagrant.configure(2) do |config|
           sudo ip addr add 100.100.100.100/32 dev lo:100
           sudo ip link set enp0s8 up
           sudo ip link set enp0s9 up
-          sudo apt-get install software-properties-common
-          sudo apt-get install python-software-properties
-          sudo add-apt-repository -y ppa:cz.nic-labs/bird
+          sudo apt-get -y install software-properties-common
+          sudo apt-get -y install python-software-properties
           sudo apt-get update
           sudo apt-get -y install bird
           sudo apt-get -y install traceroute
@@ -111,7 +111,7 @@ Vagrant.configure(2) do |config|
           sudo apt-get -y install lldpd
           sudo service lldpd start
 	  sudo cp /vagrant/bird.conf /etc/bird/bird.conf
-	  sudo service bird start
+	  sudo service bird restart
         SHELL
         bird1.vm.hostname = "bird1"
   end
@@ -119,7 +119,7 @@ Vagrant.configure(2) do |config|
     config.vm.provider "virtualbox" do |bird2|
       bird2.name = "bird2"
     end
-    bird2.vm.box = "minimal/xenial64"
+    bird2.vm.box = "ubuntu/bionic64"
         bird2.vm.network :forwarded_port, guest: 22, host: 13200, id: 'ssh'
         bird2.vm.network "private_network", virtualbox__intnet: "hostC_vtepA", auto_config: false
         bird2.vm.provision "shell", inline: <<-SHELL
